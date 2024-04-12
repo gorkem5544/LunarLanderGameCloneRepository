@@ -7,20 +7,24 @@ public enum SoundManagerTypeEnum
 }
 public class SoundManager : SingletonDontDestroyObject<SoundManager>
 {
-    [SerializeField] private AudioSource[] _audioSources;
+    [SerializeField] private SoundScriptableObject[] _soundScriptableObjects;
+    
+
     public void PlaySound(SoundManagerTypeEnum soundManagerTypeEnum)
     {
-        if (!_audioSources[(int)soundManagerTypeEnum].isPlaying)
+        SoundScriptableObject soundObject = _soundScriptableObjects[(int)soundManagerTypeEnum];
+        if (soundObject != null && !soundObject.AudioClip.isPlaying)
         {
-
-            _audioSources[(int)soundManagerTypeEnum].Play();
+            soundObject.AudioClip.Play();
         }
     }
+
     public void StopSound(SoundManagerTypeEnum soundManagerTypeEnum)
     {
-        if (_audioSources[(int)soundManagerTypeEnum].isPlaying)
+        SoundScriptableObject soundObject = _soundScriptableObjects[(int)soundManagerTypeEnum];
+        if (soundObject != null && soundObject.AudioClip.isPlaying)
         {
-            _audioSources[(int)soundManagerTypeEnum].Stop();
+            soundObject.AudioClip.Stop();
         }
     }
 

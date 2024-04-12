@@ -1,40 +1,53 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : AbstractPlayerController
 {
-    [SerializeField] private Rigidbody2D _playerRigidbody2D;
+
     private PlayerForceUpMovement _playerForceUpMovement;
-    private FuelController _fuelController;
+    private PlayerFuel _fuelController;
     private PlayerRotate _playerRotate;
     PlayerInput _playerInput;
     private IScoreManager _scoreManager;
 
-    public FuelController FuelController { get => _fuelController; set => _fuelController = value; }
+    public PlayerFuel FuelController { get => _fuelController; set => _fuelController = value; }
     public IScoreManager ScoreManager { get => _scoreManager; set => _scoreManager = value; }
+    [SerializeField] private GameObject _fireParticle;
+    Vector2 _playerEuler;
 
     private void Awake()
     {
         _playerInput = new PlayerInput();
         ScoreManager = new ScoreManager();
         _playerRotate = new PlayerRotate(this, _playerInput);
-        FuelController = new FuelController(600);
-        _playerForceUpMovement = new PlayerForceUpMovement(_playerRigidbody2D, _playerInput, 2, FuelController);
+        _fuelController = new PlayerFuel();
+        _playerForceUpMovement = new PlayerForceUpMovement(_playerRigidbody2D, _playerInput, 5, _fuelController, _fireParticle);
     }
     private void Start()
     {
-        FuelController.StartTick();
+        _fuelController.UpdateGameStartingFuel(150);
+        _playerEuler = this.transform.eulerAngles;
+        ResetPlayerPosition();
+
+        GameManager.Instance.gameStartingEvent += ResetPlayerPosition;
     }
     private void Update()
     {
         if (GameManager.Instance.GameFinished)
         {
             SoundManager.Instance.StopSound(SoundManagerTypeEnum.LaunchSound);
+            _fireParticle.gameObject.SetActive(false);
             enabled = false;
         }
         _playerForceUpMovement.UpdateTick();
-        Debug.Log(_scoreManager.Score);
+
+    }
+    private void OnDisable()
+    {
+        GameManager.Instance.gameStartingEvent -= ResetPlayerPosition;
 
     }
     private void FixedUpdate()
@@ -42,9 +55,16 @@ public class PlayerController : MonoBehaviour
         _playerForceUpMovement.FixedTick();
         _playerRotate.UpdateTick();
     }
-    public Vector2 PlayerVelocity()
+
+
+
+    public void ResetPlayerPosition()
     {
-        return _playerRigidbody2D.GetVector(_playerRigidbody2D.velocity) * 100;
+        this.transform.position = new Vector2(-7, 3);
+        _playerRigidbody2D.freezeRotation = true;
+        _playerRigidbody2D.velocity = Vector3.zero;
+        _playerRigidbody2D.freezeRotation = false;
+        this.transform.rotation = Quaternion.Euler(_playerEuler);
     }
 }
 
@@ -54,25 +74,22 @@ public class PlayerForceUpMovement
     Rigidbody2D _playerRigidbody2D;
     private float _forceSpeed;
     private bool _canForceUp = false;
-    FuelController _fuelController;
-    public PlayerForceUpMovement(Rigidbody2D playerRigidbody2D, PlayerInput playerInput, float forceSpeed, FuelController fuelController)
+    PlayerFuel _fuelController;
+    private GameObject _fireParticle;
+    private float _frictionCoefficient = 0.1f;
+    public PlayerForceUpMovement(Rigidbody2D playerRigidbody2D, PlayerInput playerInput, float forceSpeed, PlayerFuel fuelController, GameObject fireParticle)
     {
         _playerRigidbody2D = playerRigidbody2D;
         _playerInput = playerInput;
         _forceSpeed = forceSpeed;
         _fuelController = fuelController;
+        _fireParticle = fireParticle;
     }
     public void UpdateTick()
     {
-        if (_playerInput.GetInput().y > 0)
-        {
-            _canForceUp = true;
-        }
-        else
-        {
-            _canForceUp = false;
-        }
+        _canForceUp = _playerInput.GetInput().y > 0;
     }
+
     public void FixedTick()
     {
         if (_canForceUp)
@@ -81,25 +98,39 @@ public class PlayerForceUpMovement
         }
         else
         {
-            SoundManager.Instance.StopSound(SoundManagerTypeEnum.LaunchSound);
-
+            StopLaunch();
         }
     }
+
     public void ForceUp(float forceValue)
     {
+        if (_fuelController.IsEmpty)
+            return;
+
         _fuelController.FuelDecrease(0.15f);
-        if (!_fuelController.IsEmpty)
-        {
-            _playerRigidbody2D.AddRelativeForce(_playerRigidbody2D.transform.up * forceValue * Time.fixedDeltaTime);
-            SoundManager.Instance.PlaySound(SoundManagerTypeEnum.LaunchSound);
-        }
+        _playerRigidbody2D.AddRelativeForce(Vector2.up * forceValue * Time.fixedDeltaTime);
+
+        SoundManager.Instance.PlaySound(SoundManagerTypeEnum.LaunchSound);
+        _fireParticle.gameObject.SetActive(true);
     }
+
+    private void StopLaunch()
+    {
+        SoundManager.Instance.StopSound(SoundManagerTypeEnum.LaunchSound);
+        _fireParticle.gameObject.SetActive(false);
+        Vector2 frictionForce = new Vector2(-_playerRigidbody2D.velocity.x * _frictionCoefficient, 0f);
+        _playerRigidbody2D.AddForce(frictionForce);
+    }
+
 }
 
 public class PlayerRotate
 {
     PlayerController _playerController;
     PlayerInput _playerInput;
+    private float _rotationLimit = 90;
+    private float _newRotation;
+    private float _rotationSpeed = 25;
     public PlayerRotate(PlayerController playerController, PlayerInput playerInput)
     {
         _playerController = playerController;
@@ -107,10 +138,21 @@ public class PlayerRotate
     }
     public void UpdateTick()
     {
-        RotationAction(_playerInput.GetInput().x, 5f);
+        RotationAction(_playerInput.GetInput().x);
     }
-    public void RotationAction(float direction, float speed)
+    public void RotationAction(float direction)
     {
-        _playerController.transform.Rotate(Vector3.back * direction * Time.fixedDeltaTime * speed);
+        float currentRotation = _playerController.transform.eulerAngles.z;
+        float newRotation = currentRotation + direction * Time.fixedDeltaTime * _rotationSpeed;
+        if (newRotation > 180f)
+        {
+            newRotation -= 360f;
+        }
+        else if (newRotation < -180f)
+        {
+            newRotation += 360f;
+        }
+        newRotation = Mathf.Clamp(newRotation, -_rotationLimit, _rotationLimit);
+        _playerController.transform.rotation = Quaternion.Euler(0f, 0f, newRotation);
     }
 }

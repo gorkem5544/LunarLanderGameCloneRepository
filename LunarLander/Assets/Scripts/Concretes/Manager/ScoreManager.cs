@@ -11,8 +11,10 @@ public interface IScoreManager
     int Score { get; }
     System.Action<int> ScoreChanged { get; set; }
 }
-public class ScoreManager : MonoBehaviour, IScoreManager
+
+public class ScoreManager : IScoreManager
 {
+
     private int _currentScore;
     public int Score => _currentScore;
     public Action<int> ScoreChanged { get; set; }

@@ -12,6 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c096c31df0b73d4996e02359ee09ce3, type: 3}
   m_Name: Legendry
   m_EditorClassIdentifier: 
-  _headInfo: Legendry Langind
-  _score: 250
-  _gameFinishedWinOrLossEnum: 0
+  _titleText: Legandry Landing

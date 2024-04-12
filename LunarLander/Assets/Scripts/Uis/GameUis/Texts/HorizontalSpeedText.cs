@@ -9,13 +9,13 @@ enum HorizontalSpeedInfoImageEnum
 public class HorizontalSpeedText : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _horizontalSpeedText;
-    private PlayerController _playerController;
+    private AbstractPlayerController _playerController;
     [SerializeField] private Image _horizontalSpeedInfoImage;
 
     Vector3 eulerAngles;
     private void Awake()
     {
-        _playerController = FindObjectOfType<PlayerController>();
+        _playerController = FindObjectOfType<AbstractPlayerController>();
     }
     private void Start()
     {
@@ -23,17 +23,12 @@ public class HorizontalSpeedText : MonoBehaviour
     }
     private void Update()
     {
-        if (_playerController.PlayerVelocity().x >= 0)
-        {
-            _horizontalSpeedInfoImage.transform.rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y, 90);
-        }
-        else
-        {
-            _horizontalSpeedInfoImage.transform.rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y, -90);
-        }
+        float rotationAngle = (_playerController.PlayerVelocity().x >= 0) ? 90f : -90f;
+        _horizontalSpeedInfoImage.transform.rotation = Quaternion.Euler(eulerAngles.x, eulerAngles.y, rotationAngle);
+
     }
     private void LateUpdate()
     {
-        _horizontalSpeedText.text = $"HORIZONTAL SPEED {_playerController.PlayerVelocity().x.ToString("0.0")}";
+        _horizontalSpeedText.text = "HORIZONTAL SPEED: " + _playerController.GetComponent<Rigidbody2D>().velocity.magnitude.ToString("0.0");
     }
 }

@@ -14,6 +14,7 @@ public class ScoreUi : MonoBehaviour
     }
     private void Start()
     {
+
         _playerController.ScoreManager.ScoreChanged += UpdateScoreText;
     }
     private void OnDisable()
@@ -21,7 +22,7 @@ public class ScoreUi : MonoBehaviour
         _playerController.ScoreManager.ScoreChanged -= UpdateScoreText;
 
     }
-    private void UpdateScoreText(int score)
+    private void UpdateScoreText(int score = 0000)
     {
         _scoreText.text = $"SCORE {score}";
 

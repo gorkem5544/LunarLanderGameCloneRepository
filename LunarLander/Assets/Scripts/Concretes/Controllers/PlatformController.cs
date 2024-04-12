@@ -2,76 +2,72 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-enum PlatformMultipleTypeEnum
+enum PlatformMultipleScoreTypeEnum
 {
     Five, Four, Three, Two, One
 }
+public enum LandingMissionTypeEnum
+{
+    PerfectLanding, HardLanding, FailedLanding
+}
 public class PlatformController : MonoBehaviour
 {
-    [SerializeField] private GameFinishedSO[] _gameFinishedSOs;
     [SerializeField] private TextMeshPro _multipleScoreInfoText;
-    private PlatformMultipleTypeEnum _platformMultipleTypeEnum;
-    [SerializeField] private PlatformMultipleTypeEnum platformMultipleTypeEnum;
-    internal PlatformMultipleTypeEnum PlatformMultipleTypeEnum { get => _platformMultipleTypeEnum; set => _platformMultipleTypeEnum = value; }
+    private PlatformMultipleScoreTypeEnum _platformMultipleScoreTypeEnum;
+    LandingMissionTypeEnum _landingMissionTypeEnum;
+    PlayerFuel _playerFuel;
+
+
     private void Start()
     {
-        int chance = Random.Range(0, 100);
-        if (chance <= 15)
-        {
-            _platformMultipleTypeEnum = PlatformMultipleTypeEnum.Five;
-            UpdateMultipleScoreInfoText(5, true);
-        }
-        else if (chance <= 25)
-        {
-            _platformMultipleTypeEnum = PlatformMultipleTypeEnum.Four;
-            UpdateMultipleScoreInfoText(4, true);
+        //ChangedPlatformMultipleScoreValue();
+        ChangedPlatformMultipleScoreValue2();
+        GameManager.Instance.gameStartingEvent += ChangedPlatformMultipleScoreValue2;
+    }
+    private void OnDisable()
+    {
+        GameManager.Instance.gameStartingEvent -= ChangedPlatformMultipleScoreValue2;
 
-        }
-        else if (chance <= 35)
-        {
-            _platformMultipleTypeEnum = PlatformMultipleTypeEnum.Three;
-            UpdateMultipleScoreInfoText(3, true);
-
-        }
-        else if (chance <= 50)
-        {
-            _platformMultipleTypeEnum = PlatformMultipleTypeEnum.Two;
-            UpdateMultipleScoreInfoText(2, true);
-        }
-        else
-        {
-            _platformMultipleTypeEnum = PlatformMultipleTypeEnum.One;
-            UpdateMultipleScoreInfoText(1, false);
-        }
-        platformMultipleTypeEnum = _platformMultipleTypeEnum;
-        Debug.Log(_platformMultipleTypeEnum);
     }
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.collider.TryGetComponent(out PlayerController playerController))
         {
-            GameManager.Instance.MissionComplete(playerController.PlayerVelocity().y, TotalScore());
+            float hitSpeed = other.relativeVelocity.magnitude * 100;
+            UiManager.Instance.OpenLandingMissionEvent(hitSpeed, TotalScore());
             playerController.ScoreManager.AddScore(TotalScore());
+            _playerFuel = playerController.FuelController;
+            playerController.FuelController.UpdateGameStartingFuel(_playerFuel.GameStartingFuel - (_playerFuel.GameStartingFuel - _playerFuel.CurrentFuel));
+
+
+            if (_playerFuel.IsEmpty)
+            {
+                GameManager.Instance.GameManagerStateMachine.StateMachineTransitionState(GameManager.Instance.GameManagerStateMachine.GameManagerGameOverState);
+            }
+            else
+            {
+                GameManager.Instance.GameManagerStateMachine.StateMachineTransitionState(GameManager.Instance.GameManagerStateMachine.GameManagerMissionOverSate);
+            }
         }
     }
     public int TotalScore()
     {
         int score = 50;
-        switch (_platformMultipleTypeEnum)
+        switch (_platformMultipleScoreTypeEnum)
         {
-            case PlatformMultipleTypeEnum.One:
+            case PlatformMultipleScoreTypeEnum.One:
                 score *= 1;
                 break;
-            case PlatformMultipleTypeEnum.Two:
+            case PlatformMultipleScoreTypeEnum.Two:
                 score *= 2;
                 break;
-            case PlatformMultipleTypeEnum.Three:
+            case PlatformMultipleScoreTypeEnum.Three:
                 score *= 3;
                 break;
-            case PlatformMultipleTypeEnum.Four:
+            case PlatformMultipleScoreTypeEnum.Four:
                 score *= 4;
                 break;
-            case PlatformMultipleTypeEnum.Five:
+            case PlatformMultipleScoreTypeEnum.Five:
                 score *= 5;
                 break;
         }
@@ -81,5 +77,74 @@ public class PlatformController : MonoBehaviour
     {
         _multipleScoreInfoText.gameObject.SetActive(canActive);
         _multipleScoreInfoText.text = $"x{multipleValue}";
+    }
+    public void ChangedPlatformMultipleScoreValue()
+    {
+        int chance = Random.Range(0, 100);
+        if (chance <= 15)
+        {
+            _platformMultipleScoreTypeEnum = PlatformMultipleScoreTypeEnum.Five;
+            UpdateMultipleScoreInfoText(5, true);
+        }
+        else if (chance <= 25)
+        {
+            _platformMultipleScoreTypeEnum = PlatformMultipleScoreTypeEnum.Four;
+            UpdateMultipleScoreInfoText(4, true);
+
+        }
+        else if (chance <= 35)
+        {
+            _platformMultipleScoreTypeEnum = PlatformMultipleScoreTypeEnum.Three;
+            UpdateMultipleScoreInfoText(3, true);
+
+        }
+        else if (chance <= 50)
+        {
+            _platformMultipleScoreTypeEnum = PlatformMultipleScoreTypeEnum.Two;
+            UpdateMultipleScoreInfoText(2, true);
+        }
+        else
+        {
+            _platformMultipleScoreTypeEnum = PlatformMultipleScoreTypeEnum.One;
+            UpdateMultipleScoreInfoText(1, false);
+        }
+    }
+
+    public int TotalScore2()
+    {
+        int score = 50 * (int)_platformMultipleScoreTypeEnum;
+        return score;
+    }
+
+    private void UpdateMultipleScoreInfoText2(int multipleValue, bool canActive = true)
+    {
+        _multipleScoreInfoText.gameObject.SetActive(canActive);
+        _multipleScoreInfoText.text = $"x{multipleValue}";
+    }
+
+    public void ChangedPlatformMultipleScoreValue2()
+    {
+        int[] chances = { 15, 10, 10, 15, 50 };
+        int chance = Random.Range(0, 100);
+
+        PlatformMultipleScoreTypeEnum[] scoreEnums = {
+        PlatformMultipleScoreTypeEnum.Five,
+        PlatformMultipleScoreTypeEnum.Four,
+        PlatformMultipleScoreTypeEnum.Three,
+        PlatformMultipleScoreTypeEnum.Two,
+        PlatformMultipleScoreTypeEnum.One
+    };
+
+        for (int i = 0; i < chances.Length; i++)
+        {
+            if (chance <= chances[i])
+            {
+                _platformMultipleScoreTypeEnum = scoreEnums[i];
+                UpdateMultipleScoreInfoText(chances.Length - i, i < 4);
+                return;
+            }
+
+            chance -= chances[i];
+        }
     }
 }

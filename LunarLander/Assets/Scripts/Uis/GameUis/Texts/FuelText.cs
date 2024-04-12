@@ -13,7 +13,6 @@ public class FuelText : AbstractTextUi
     }
     private void UpdateFuelText()
     {
-        _text.text = $"FUEL {_playerController.FuelController.CurrentFuel}";
-      
+        _text.text = $"FUEL {_playerController.FuelController.CurrentFuel.ToString("0.0")}";
     }
 }
