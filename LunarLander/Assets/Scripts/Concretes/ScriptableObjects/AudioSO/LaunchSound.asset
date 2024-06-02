@@ -12,5 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbf5d8c867688704fa17f55aed764abc, type: 3}
   m_Name: LaunchSound
   m_EditorClassIdentifier: 
-  _soundManagerTypeEnum: 0
-  _audioClip: {fileID: 0}
+  AudioClip: {fileID: 8300000, guid: 8c27768aad61cc94a97be72de4c90dbe, type: 3}

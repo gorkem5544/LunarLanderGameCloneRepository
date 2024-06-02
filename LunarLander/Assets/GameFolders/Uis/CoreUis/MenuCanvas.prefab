@@ -1383,7 +1383,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 932e84d9f9b8bc445a3474496aca0ddb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _altitudeText: {fileID: 6165856977173752505}
+  _altitudeDisplayText: {fileID: 6165856977173752505}
   _groundLayer:
     serializedVersion: 2
     m_Bits: 64

@@ -12,5 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbf5d8c867688704fa17f55aed764abc, type: 3}
   m_Name: GameSound
   m_EditorClassIdentifier: 
-  _soundManagerTypeEnum: 1
-  _audioSource: {fileID: 0}
+  AudioClip: {fileID: 8300000, guid: dc58dc62999368b45827d5f6e2d2533f, type: 3}
