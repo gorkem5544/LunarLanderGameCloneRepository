@@ -1,27 +1,21 @@
+using System;
 using UnityEngine;
 
 public class PlayerForceUpMovement
 {
-    private readonly Rigidbody2D _playerRigidbody2D;
-    private readonly PlayerInput _playerInput;
-    private readonly PlayerFuel _fuelController;
     private readonly GameObject _fireParticle;
-    private readonly float _forceSpeed;
-    private readonly float _frictionCoefficient = 0.1f;
-
     private bool _canForceUp = false;
+    IPlayerForceUpMovementService _playerForceUpMovementService;
 
-    public PlayerForceUpMovement(Rigidbody2D playerRigidbody2D, PlayerInput playerInput, float forceSpeed, PlayerFuel fuelController, GameObject fireParticle)
+    public PlayerForceUpMovement(GameObject fireParticle, IPlayerForceUpMovementService playerForceUpMovementService)
     {
-        _playerRigidbody2D = playerRigidbody2D;
-        _playerInput = playerInput;
-        _forceSpeed = forceSpeed;
-        _fuelController = fuelController;
-        _fireParticle = fireParticle;
+        _playerForceUpMovementService = playerForceUpMovementService;
+        _fireParticle = fireParticle ?? throw new ArgumentNullException(nameof(fireParticle));
     }
+
     public void UpdateTick()
     {
-        _canForceUp = _playerInput.GetInput().y > 0;
+        _canForceUp = _playerForceUpMovementService.PlayerInput.GetInput().y > 0;
     }
 
     public void FixedTick()
@@ -38,11 +32,11 @@ public class PlayerForceUpMovement
 
     private void ApplyForceUp()
     {
-        if (_fuelController.IsEmpty)
+        if (_playerForceUpMovementService.PlayerFuel.IsEmpty)
             return;
 
-        _fuelController.FuelDecrease(0.15f);
-        _playerRigidbody2D.AddRelativeForce(Vector2.up * _forceSpeed * Time.fixedDeltaTime);
+        _playerForceUpMovementService.PlayerFuel.FuelDecrease(0.15f);
+        _playerForceUpMovementService.Rigidbody2D.AddRelativeForce(Vector2.up * _playerForceUpMovementService.PlayerForceSO.ForceSpeed * Time.fixedDeltaTime);
 
         SoundManager.Instance.PlaySound(SoundManagerTypeEnum.LaunchSound);
         _fireParticle.SetActive(true);
@@ -52,8 +46,7 @@ public class PlayerForceUpMovement
     {
         SoundManager.Instance.StopSound(SoundManagerTypeEnum.LaunchSound);
         _fireParticle.SetActive(false);
-        Vector2 frictionForce = new Vector2(-_playerRigidbody2D.velocity.x * _frictionCoefficient, 0f);
-        _playerRigidbody2D.AddForce(frictionForce);
+        Vector2 frictionForce = new Vector2(-_playerForceUpMovementService.Rigidbody2D.velocity.x * _playerForceUpMovementService.PlayerForceSO.FrictionCoefficient, 0f);
+        _playerForceUpMovementService.Rigidbody2D.AddForce(frictionForce);
     }
-
 }

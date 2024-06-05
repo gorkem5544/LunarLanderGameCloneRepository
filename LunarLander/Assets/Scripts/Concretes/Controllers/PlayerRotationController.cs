@@ -3,29 +3,26 @@ using UnityEngine;
 
 public class PlayerRotationController
 {
-    private readonly PlayerController _playerController;
-    private readonly PlayerInput _playerInput;
-    private readonly float _rotationLimit = 90f;
-    private readonly float _rotationSpeed = 25f;
 
-    public PlayerRotationController(PlayerController playerController, PlayerInput playerInput)
+
+    IPlayerRotationService _playerRotationService;
+    public PlayerRotationController(IPlayerRotationService playerRotationService)
     {
-        _playerController = playerController;
-        _playerInput = playerInput;
+        _playerRotationService = playerRotationService;
     }
 
-    public void UpdateRotation()
+    public void FixedUpdateRotation()
     {
-        RotatePlayer(_playerInput.GetInput().x);
+        RotatePlayer(_playerRotationService.PlayerInput.GetInput().x);
     }
 
     private void RotatePlayer(float rotationDirection)
     {
-        float currentRotation = _playerController.transform.eulerAngles.z;
-        float newRotation = currentRotation + rotationDirection * Time.fixedDeltaTime * _rotationSpeed;
+        float currentRotation = _playerRotationService.PlayerTransform.eulerAngles.z;
+        float newRotation = currentRotation + rotationDirection * Time.fixedDeltaTime * _playerRotationService.PlayerRotateSO.RotationSpeed;
         newRotation = NormalizeAngle(newRotation);
-        newRotation = Mathf.Clamp(newRotation, -_rotationLimit, _rotationLimit);
-        _playerController.transform.rotation = Quaternion.Euler(0f, 0f, newRotation);
+        newRotation = Mathf.Clamp(newRotation, -_playerRotationService.PlayerRotateSO.RotationLimit, _playerRotationService.PlayerRotateSO.RotationLimit);
+        _playerRotationService.PlayerTransform.rotation = Quaternion.Euler(0f, 0f, newRotation);
     }
 
     private float NormalizeAngle(float angle)

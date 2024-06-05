@@ -439,4 +439,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerRigidbody2D: {fileID: 2880135872462471525}
+  _playerSO: {fileID: 11400000, guid: 47dfeeb5699c3c540a5504d4d8f4165f, type: 2}
   _fireParticle: {fileID: 157517520274798167}
