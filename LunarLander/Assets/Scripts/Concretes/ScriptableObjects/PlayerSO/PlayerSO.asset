@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: PlayerSO
   m_EditorClassIdentifier: 
   _forceSpeed: 5
-  _rotationSpeed: 0
-  _rotationLimit: 0
+  _frictionCoefficient: 0.1
+  _rotationSpeed: 25
+  _rotationLimit: 90
