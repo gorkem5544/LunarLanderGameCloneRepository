@@ -4,7 +4,11 @@ using TMPro;
 using UnityEngine;
 enum PlatformMultipleScoreTypeEnum
 {
-    Five, Four, Three, Two, One
+    Five = 5,
+    Four = 4,
+    Three = 3,
+    Two = 2,
+    One = 1
 }
 public enum LandingMissionTypeEnum
 {
@@ -14,64 +18,49 @@ public class PlatformController : MonoBehaviour
 {
     [SerializeField] private TextMeshPro _multipleScoreInfoText;
     private PlatformMultipleScoreTypeEnum _platformMultipleScoreTypeEnum;
-    LandingMissionTypeEnum _landingMissionTypeEnum;
+
     PlayerFuel _playerFuel;
 
 
     private void Start()
     {
-        //ChangedPlatformMultipleScoreValue();
-        ChangedPlatformMultipleScoreValue2();
-        GameManager.Instance.gameStartingEvent += ChangedPlatformMultipleScoreValue2;
+        ChangedPlatformMultipleScoreValue();
+        GameManager.Instance.gameStartingEvent += ChangedPlatformMultipleScoreValue;
     }
+
     private void OnDisable()
     {
-        GameManager.Instance.gameStartingEvent -= ChangedPlatformMultipleScoreValue2;
-
+        GameManager.Instance.gameStartingEvent -= ChangedPlatformMultipleScoreValue;
     }
+
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.collider.TryGetComponent(out PlayerController playerController))
         {
-            float hitSpeed = other.relativeVelocity.magnitude * 100;
-            UiManager.Instance.OpenLandingMissionEvent(hitSpeed, TotalScore());
-            playerController.ScoreManager.AddScore(TotalScore());
-            _playerFuel = playerController.FuelController;
-            playerController.FuelController.UpdateGameStartingFuel(_playerFuel.GameStartingFuel - (_playerFuel.GameStartingFuel - _playerFuel.CurrentFuel));
+            HandleCollision(playerController, other.relativeVelocity.magnitude * 100);
+        }
+    }
 
+    private void HandleCollision(PlayerController playerController, float hitSpeed)
+    {
+        int totalScore = TotalScore();
+        UiManager.Instance.OpenLandingMissionEvent(hitSpeed, totalScore);
+        playerController.ScoreManager.AddScore(totalScore);
+        _playerFuel = playerController.FuelController;
+        playerController.FuelController.UpdateGameStartingFuel(_playerFuel.GameStartingFuel - (_playerFuel.GameStartingFuel - _playerFuel.CurrentFuel));
 
-            if (_playerFuel.IsEmpty)
-            {
-                GameManager.Instance.GameManagerStateMachine.StateMachineTransitionState(GameManager.Instance.GameManagerStateMachine.GameManagerGameOverState);
-            }
-            else
-            {
-                GameManager.Instance.GameManagerStateMachine.StateMachineTransitionState(GameManager.Instance.GameManagerStateMachine.GameManagerMissionOverSate);
-            }
+        if (_playerFuel.IsEmpty)
+        {
+            GameManager.Instance.GameManagerStateMachine.StateMachineTransitionState(GameManager.Instance.GameManagerStateMachine.GameManagerGameOverState);
+        }
+        else
+        {
+            GameManager.Instance.GameManagerStateMachine.StateMachineTransitionState(GameManager.Instance.GameManagerStateMachine.GameManagerMissionOverSate);
         }
     }
     public int TotalScore()
     {
-        int score = 50;
-        switch (_platformMultipleScoreTypeEnum)
-        {
-            case PlatformMultipleScoreTypeEnum.One:
-                score *= 1;
-                break;
-            case PlatformMultipleScoreTypeEnum.Two:
-                score *= 2;
-                break;
-            case PlatformMultipleScoreTypeEnum.Three:
-                score *= 3;
-                break;
-            case PlatformMultipleScoreTypeEnum.Four:
-                score *= 4;
-                break;
-            case PlatformMultipleScoreTypeEnum.Five:
-                score *= 5;
-                break;
-        }
-        return score;
+        return 50 * (int)_platformMultipleScoreTypeEnum;
     }
     private void UpdateMultipleScoreInfoText(int multipleValue, bool canActive = true)
     {
@@ -80,47 +69,20 @@ public class PlatformController : MonoBehaviour
     }
     public void ChangedPlatformMultipleScoreValue()
     {
+        _platformMultipleScoreTypeEnum = GetRandomPlatformScore();
+        UpdateMultipleScoreInfoText((int)_platformMultipleScoreTypeEnum, _platformMultipleScoreTypeEnum != PlatformMultipleScoreTypeEnum.One);
+    }
+
+    private PlatformMultipleScoreTypeEnum GetRandomPlatformScore()
+    {
         int chance = Random.Range(0, 100);
-        if (chance <= 15)
-        {
-            _platformMultipleScoreTypeEnum = PlatformMultipleScoreTypeEnum.Five;
-            UpdateMultipleScoreInfoText(5, true);
-        }
-        else if (chance <= 25)
-        {
-            _platformMultipleScoreTypeEnum = PlatformMultipleScoreTypeEnum.Four;
-            UpdateMultipleScoreInfoText(4, true);
-
-        }
-        else if (chance <= 35)
-        {
-            _platformMultipleScoreTypeEnum = PlatformMultipleScoreTypeEnum.Three;
-            UpdateMultipleScoreInfoText(3, true);
-
-        }
-        else if (chance <= 50)
-        {
-            _platformMultipleScoreTypeEnum = PlatformMultipleScoreTypeEnum.Two;
-            UpdateMultipleScoreInfoText(2, true);
-        }
-        else
-        {
-            _platformMultipleScoreTypeEnum = PlatformMultipleScoreTypeEnum.One;
-            UpdateMultipleScoreInfoText(1, false);
-        }
+        if (chance <= 15) return PlatformMultipleScoreTypeEnum.Five;
+        if (chance <= 25) return PlatformMultipleScoreTypeEnum.Four;
+        if (chance <= 35) return PlatformMultipleScoreTypeEnum.Three;
+        if (chance <= 50) return PlatformMultipleScoreTypeEnum.Two;
+        return PlatformMultipleScoreTypeEnum.One;
     }
 
-    public int TotalScore2()
-    {
-        int score = 50 * (int)_platformMultipleScoreTypeEnum;
-        return score;
-    }
-
-    private void UpdateMultipleScoreInfoText2(int multipleValue, bool canActive = true)
-    {
-        _multipleScoreInfoText.gameObject.SetActive(canActive);
-        _multipleScoreInfoText.text = $"x{multipleValue}";
-    }
 
     public void ChangedPlatformMultipleScoreValue2()
     {
