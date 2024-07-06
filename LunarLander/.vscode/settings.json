@@ -58,6 +58,7 @@
     },
     "dotnet.defaultSolution": "LunarLander.sln",
     "cSpell.words": [
-        "raycast"
+        "raycast",
+        "UGUI"
     ]
 }
