@@ -12,7 +12,7 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerMovements.Concretes
 
         private float _currentFuel;
 
-        public float gameStartingFuel { get; private set; }
+        public float GameStartingFuel { get; private set; }
         public bool IsEmpty => _currentFuel <= 1f;
         public float CurrentFuel => _currentFuel;
         public bool IsFuelAlert => _currentFuel < 100;
@@ -22,13 +22,13 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerMovements.Concretes
 
         public PlayerFuel(IPlayerFuelService playerFuelService)
         {
-            gameStartingFuel = playerFuelService.PlayerFuelSO.GameStartingFuelAmount;
-            _currentFuel = gameStartingFuel;
+            GameStartingFuel = playerFuelService.PlayerFuelSO.GameStartingFuelAmount;
+            _currentFuel = GameStartingFuel;
         }
 
         public void UpdateGameStartingFuel(float fuelValue)
         {
-            gameStartingFuel = fuelValue;
+            GameStartingFuel = fuelValue;
             _currentFuel = fuelValue;
         }
 

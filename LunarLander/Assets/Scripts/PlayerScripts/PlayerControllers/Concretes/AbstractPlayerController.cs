@@ -8,14 +8,14 @@ using UnityEngine;
 public abstract class AbstractPlayerController : MonoBehaviour, IBasePlayerController
 {
 
-    public Rigidbody2D Rigidbody2D => _playerRigidbody2D;
-    [SerializeField] protected Rigidbody2D _playerRigidbody2D;
+    public Rigidbody2D Rigidbody2D => _playerRigidBody2D;
+    [SerializeField] protected Rigidbody2D _playerRigidBody2D;
 
 
     protected virtual void Awake()
     {
-        _playerRigidbody2D = GetComponent<Rigidbody2D>();
+        _playerRigidBody2D = GetComponent<Rigidbody2D>();
     }
-    public virtual Vector2 PlayerVelocity => _playerRigidbody2D.velocity * 100;
+    public virtual Vector2 PlayerVelocity => _playerRigidBody2D.linearVelocity * 100;
 
 }

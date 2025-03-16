@@ -2,7 +2,8 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerMovements.Abstracts
 {
     public interface IPlayerRotateMovement
     {
-        void FixedUpdateRotation();
+        void FixedUpdateTick();
+        void UpdateTick();
         void RotatePlayer(float rotationDirection);
     }
 }

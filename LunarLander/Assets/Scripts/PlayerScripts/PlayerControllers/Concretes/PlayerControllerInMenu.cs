@@ -16,7 +16,7 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerControllers.Concret
 
         public Rigidbody2D Rigidbody2D => _playerRigidbody2D;
         [SerializeField] protected Rigidbody2D _playerRigidbody2D;
-        public Vector2 PlayerVelocity => _playerRigidbody2D.velocity * 100;
+        public Vector2 PlayerVelocity => _playerRigidbody2D.linearVelocity * 100;
 
 
         private void Awake()

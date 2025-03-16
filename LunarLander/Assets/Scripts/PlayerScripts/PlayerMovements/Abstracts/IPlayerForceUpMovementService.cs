@@ -10,8 +10,7 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerMovements.Abstracts
         IPlayerInput PlayerInput { get; }
         IPlayerFuel PlayerFuel { get; }
         IPlayerFeedback PlayerFeedback { get; }
-        Rigidbody2D Rigidbody2D { get; }
-
+        Rigidbody2D RigidBody2D { get; }
 
     }
 

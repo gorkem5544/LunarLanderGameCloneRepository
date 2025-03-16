@@ -7,36 +7,34 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerMovements.Concretes
     public class PlayerRotateMovementWithQuaternion : IPlayerRotateMovement
     {
         IPlayerRotationService _playerRotationService;
+        private float _rotationInput;
         public PlayerRotateMovementWithQuaternion(IPlayerRotationService playerRotationService)
         {
             _playerRotationService = playerRotationService;
         }
 
-        public void FixedUpdateRotation()
+        public void UpdateTick()
         {
-            RotatePlayer(_playerRotationService.PlayerInput.GetInput().x);
+            _rotationInput = _playerRotationService.PlayerInput.Input.x;
+        }
+        public void FixedUpdateTick()
+        {
+            RotatePlayer(_rotationInput);
         }
 
         public void RotatePlayer(float rotationDirection)
         {
+            if (Mathf.Approximately(rotationDirection, 0f)) return;
             float currentRotation = _playerRotationService.PlayerTransform.eulerAngles.z;
-            float newRotation = currentRotation + rotationDirection * Time.fixedDeltaTime * _playerRotationService.PlayerRotateSO.RotationSpeed;
+            float newRotation = currentRotation - rotationDirection * Time.fixedDeltaTime * _playerRotationService.PlayerRotateSO.RotationSpeed;
             newRotation = NormalizeAngle(newRotation);
             newRotation = Mathf.Clamp(newRotation, -_playerRotationService.PlayerRotateSO.RotationLimit, _playerRotationService.PlayerRotateSO.RotationLimit);
+
             _playerRotationService.PlayerTransform.rotation = Quaternion.Euler(0f, 0f, newRotation);
         }
-
         private float NormalizeAngle(float angle)
         {
-            if (angle > 180f)
-            {
-                angle -= 360f;
-            }
-            else if (angle < -180f)
-            {
-                angle += 360f;
-            }
-            return angle;
+            return Mathf.DeltaAngle(0f, angle);
         }
     }
 

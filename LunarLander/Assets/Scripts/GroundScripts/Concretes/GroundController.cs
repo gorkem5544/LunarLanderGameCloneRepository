@@ -24,6 +24,7 @@ namespace Assembly_CSharp.Assets.Scripts.GroundScripts.Concretes
                     GameManager.Instance.TransitionToState(GameManagerStateEnum.MissionFailedState);
                     playerController.FuelController.ShipExplosionDecreaseFuel();
                 }
+
             }
 
         }

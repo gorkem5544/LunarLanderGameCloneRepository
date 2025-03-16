@@ -20,15 +20,12 @@ namespace Assembly_CSharp.Assets.Scripts.StateMachineScripts.Concretes.GameManag
 
             _gameManager.GameStarting();
             UiManager.Instance.CloseLandingMissionEvent();
-            SoundManager.Instance.StopSound(SoundManagerTypeEnum.MenuSound);
-            SoundManager.Instance.PlaySound(SoundManagerTypeEnum.GameSound);
-            SoundManager.Instance.SetVolume(SoundManagerTypeEnum.GameSound, 0.1f);
+            SoundManager.Instance.PlaySound(GameSoundTypeEnum.GameInMusic);
         }
 
         public void ExitState()
         {
-
-
+            SoundManager.Instance.PlaySound(GameSoundTypeEnum.GameInMusic);
         }
 
         public void UpdateState()

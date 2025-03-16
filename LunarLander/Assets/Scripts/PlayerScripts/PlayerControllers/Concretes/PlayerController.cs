@@ -38,20 +38,24 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerControllers.Concret
 
         public IPlayerFeedback PlayerFeedback => _playerFeedbackService;
 
+
         IPlayerPositionResetService _playerPositionResetService;
         IPlayerPositionReset _playerPositionReset;
 
         IPlayerFeedback _playerFeedbackService;
-        IPlayerRotationService _playerRotationService;
+        IPlayerRotationService _playerRotateService;
         IPlayerForceUpMovementService _playerForceUpMovementService;
         IPlayerFuelService _playerFuelService;
 
 
-
         protected override void Awake()
         {
+
             base.Awake();
             InitializeDependencies();
+
+            InitializePlayerMovements();
+
         }
         private void Start()
         {
@@ -61,6 +65,7 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerControllers.Concret
         private void Update()
         {
             _playerForceUpMovement.UpdateTick();
+            _playerRotate.UpdateTick();
         }
         private void OnDisable()
         {
@@ -69,16 +74,15 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerControllers.Concret
         }
         private void FixedUpdate()
         {
+
+            _playerRotate.FixedUpdateTick();
             _playerForceUpMovement.FixedTick();
-            _playerRotate.FixedUpdateRotation();
         }
-
-
 
         public void ResetPlayerPosition()
         {
             _playerPositionReset.ResetPosition();
-            _playerRigidbody2D.bodyType = RigidbodyType2D.Dynamic;
+            _playerRigidBody2D.bodyType = RigidbodyType2D.Dynamic;
         }
         private void InitializeDependencies()
         {
@@ -86,35 +90,40 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerControllers.Concret
             _playerFeedbackService = new PlayerFeedback(_fireParticle);
             _scoreManager = new ScoreManager();
 
-            PlayerPositionDependencies();
-            PlayerFuelDependencies();
-            PlayerForceUpMovementDependencies();
-            RotatePlayerDependencies();
+            InitializePlayerPositionReset();
+            InitializePlayerFuel();
+
         }
 
-        private void PlayerPositionDependencies()
+        private void InitializePlayerPositionReset()
         {
             _playerPositionResetService = new PlayerPositionResetService(this, new Vector2(-7, 3), transform.eulerAngles);
             _playerPositionReset = new PlayerPositionReset(_playerPositionResetService);
         }
 
-        private void PlayerFuelDependencies()
+        private void InitializePlayerFuel()
         {
             _playerFuelService = new PlayerFuelService(this);
             _fuelController = new PlayerFuel(_playerFuelService);
         }
 
-        private void PlayerForceUpMovementDependencies()
+        #region Movements
+        private void InitializePlayerMovements()
+        {
+            InitializePlayerForceUpMovement();
+            InitializePlayerRotation();
+        }
+        private void InitializePlayerForceUpMovement()
         {
             _playerForceUpMovementService = new PlayerForceUpMovementService(this);
             _playerForceUpMovement = new PlayerForceUpMovementWithRigidBodyAddForce(_playerForceUpMovementService);
         }
-
-        private void RotatePlayerDependencies()
+        private void InitializePlayerRotation()
         {
-            _playerRotationService = new PlayerRotationService(this);
-            _playerRotate = new PlayerRotateMovementWithQuaternion(_playerRotationService);
+            _playerRotateService = new PlayerRotationService(this);
+            _playerRotate = new PlayerRotateMovementWithQuaternion(_playerRotateService);
         }
+        #endregion
     }
 
 }

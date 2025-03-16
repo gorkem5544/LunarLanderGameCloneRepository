@@ -12,10 +12,15 @@ namespace Assembly_CSharp.Assets.Scripts.ManagerScripts.Concretes
         public event System.Action gameStartingEvent;
         private StateMachine _stateMachine;
 
+        //[SerializeField] private SoundManager _soundManager;
+        //public SoundManager SoundManager => _soundManager;
+
+        //private SoundManager soundManager;
 
         protected override void Awake()
         {
             base.Awake();
+
             _stateMachine = new StateMachine();
         }
         private void Start()

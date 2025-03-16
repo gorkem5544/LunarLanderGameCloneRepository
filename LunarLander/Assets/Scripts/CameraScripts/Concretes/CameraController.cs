@@ -9,7 +9,7 @@ namespace Assembly_CSharp.Assets.Scripts.CameraScripts.Concretes
         [SerializeField] private Camera _playerCamera;
         [SerializeField] private Camera _mapCamera;
         private Transform _playerTransform;
-        [SerializeField] private CameraScriptableObject _cameraScriptableObject;
+        [SerializeField] private CameraScriptableObject _cameraScripTableObject;
 
         private IDistanceCalculator _distanceCalculator;
         private float _playerDistanceGround;
@@ -22,14 +22,14 @@ namespace Assembly_CSharp.Assets.Scripts.CameraScripts.Concretes
         public void Initialize(IBasePlayerController abstractPlayerController)
         {
             _playerTransform = abstractPlayerController.transform;
-            _distanceCalculator = new DistanceCalculator(abstractPlayerController.transform, _cameraScriptableObject.GroundLayer);
+            _distanceCalculator = new DistanceCalculator(abstractPlayerController.transform, _cameraScripTableObject.GroundLayer);
         }
         private void Update()
         {
             _playerDistanceGround = _distanceCalculator.CalculateDistanceToGround();
             if (_playerDistanceGround < 0) return;
 
-            if (_playerDistanceGround < _cameraScriptableObject.GroundDistance)
+            if (_playerDistanceGround < _cameraScripTableObject.GroundDistance)
             {
                 SetActiveCamera(_playerCamera, true);
                 SetActiveCamera(_mapCamera, false);
@@ -51,8 +51,8 @@ namespace Assembly_CSharp.Assets.Scripts.CameraScripts.Concretes
         {
             Vector3 targetPosition = _playerTransform.position;
             targetPosition.z = -10;
-            _playerCamera.transform.position = Vector3.Lerp(_playerCamera.transform.position, targetPosition, Time.deltaTime * _cameraScriptableObject.ZoomSpeed);
-            _playerCamera.orthographicSize = _cameraScriptableObject.CloseZoom;
+            _playerCamera.transform.position = Vector3.Lerp(_playerCamera.transform.position, targetPosition, Time.deltaTime * _cameraScripTableObject.ZoomSpeed);
+            _playerCamera.orthographicSize = _cameraScripTableObject.CloseZoom;
         }
     }
 

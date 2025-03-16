@@ -27,12 +27,12 @@ public class FuelAlertObject : MonoBehaviour
         {
             UpdateFuelAlertPanelActivity(_currentTime <= 4);
             _currentTime %= 4;
-            SoundManager.Instance.PlaySound(SoundManagerTypeEnum.MenuSound);
+            //SoundManager.Instance.PlaySound(SoundManagerTypeEnum.MenuSound);
         }
         else
         {
             UpdateFuelAlertPanelActivity(false);
-            SoundManager.Instance.StopSound(SoundManagerTypeEnum.MenuSound);
+            //SoundManager.Instance.StopSound(SoundManagerTypeEnum.MenuSound);
 
         }
     }

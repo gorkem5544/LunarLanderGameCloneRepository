@@ -19,11 +19,12 @@ public class VerticalSpeedValueText : MonoBehaviour
         if (_playerController != null)
         {
             VerticalSpeedText();
+
         }
     }
     private void VerticalSpeedText()
     {
-        float VerticalSpeed = _playerController.PlayerVelocity.y;
-        _verticalSpeedText.text = $"VERTICAL SPEED: {VerticalSpeed:0.0}";
+        float verticalSpeed = Vector2.Dot(_playerController.PlayerVelocity, Vector2.down);
+        _verticalSpeedText.text = $"VERTICAL SPEED: {verticalSpeed:0.0}";
     }
 }

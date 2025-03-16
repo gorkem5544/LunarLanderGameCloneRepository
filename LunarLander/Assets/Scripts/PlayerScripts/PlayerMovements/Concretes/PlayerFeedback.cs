@@ -16,12 +16,12 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerMovements.Concretes
 
         public void PlayLaunchSound()
         {
-            SoundManager.Instance.PlaySound(SoundManagerTypeEnum.LaunchSound);
+            //SoundManager.Instance.PlaySound(SoundManagerTypeEnum.LaunchSound);
         }
 
         public void StopLaunchSound()
         {
-            SoundManager.Instance.StopSound(SoundManagerTypeEnum.LaunchSound);
+            //SoundManager.Instance.StopSound(SoundManagerTypeEnum.LaunchSound);
         }
 
         public void ActivateFireParticle()

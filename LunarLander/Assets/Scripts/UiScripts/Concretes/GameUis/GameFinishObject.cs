@@ -9,6 +9,7 @@ using UnityEngine;
 public class GameFinishObject : MonoBehaviour
 {
     [SerializeField] private GameFinishPanel _gameFinishPanel;
+    [SerializeField] private DetermineLandingSO _determineLandingSO;
     [SerializeField] private LunaLandingMissionScenariosSO[] _landingMissionSuccessScenarios;
     [SerializeField] private LunaLandingMissionScenariosSO _landingMissionFailedScenario;
 
@@ -16,54 +17,55 @@ public class GameFinishObject : MonoBehaviour
 
     private void Start()
     {
-        ChangedMissionPanelActivity(false);
-        UiManager.Instance.OpenLandingMissionEvent += HandleJ;
+        SetMissionPanelActive(false);
+        UiManager.Instance.OpenLandingMissionEvent += Landing;
         UiManager.Instance.CloseLandingMissionEvent += HandleOnClosedLandingMissionPanel;
     }
 
     private void HandleOnClosedLandingMissionPanel()
     {
-        ChangedMissionPanelActivity(false);
+        SetMissionPanelActive(false);
     }
 
     private void OnDisable()
     {
-        UiManager.Instance.OpenLandingMissionEvent -= HandleJ;
+        UiManager.Instance.OpenLandingMissionEvent -= Landing;
         UiManager.Instance.CloseLandingMissionEvent -= HandleOnClosedLandingMissionPanel;
     }
-    private void HandleJ(float playerVelocityY, int totalScore)
+    private void Landing(float playerVelocityY, int totalScore)
     {
-        switch (math.abs(playerVelocityY))
+        float absVelocityY = Mathf.Abs(playerVelocityY);
+
+
+
+        if (absVelocityY > _determineLandingSO.FallSpeedDestroyLanding)
         {
-            case > 50:
-                OpenLandingMissionFailedScenarios(_landingMissionFailedScenario, totalScore);
-                break;
-            case > 25:
-                OpenLandingMissionSuccessScenarios(_landingMissionSuccessScenarios[2], totalScore);
-                break;
-            case > 15:
-                OpenLandingMissionSuccessScenarios(_landingMissionSuccessScenarios[1], totalScore);
-                break;
-            case > 0:
-                OpenLandingMissionSuccessScenarios(_landingMissionSuccessScenarios[0], totalScore);
-                break;
-            default:
-                OpenLandingMissionFailedScenarios(_landingMissionFailedScenario, totalScore);
-                break;
+            OpenLandingMissionPanel(_landingMissionFailedScenario, totalScore);
+        }
+        else if (absVelocityY > _determineLandingSO.FallSpeedBadLanding)
+        {
+            OpenLandingMissionPanel(_landingMissionSuccessScenarios[2], totalScore);
+        }
+        else if (absVelocityY > _determineLandingSO.FallSpeedNormalLanding)
+        {
+            OpenLandingMissionPanel(_landingMissionSuccessScenarios[1], totalScore);
+        }
+        else if (absVelocityY > _determineLandingSO.FallSpeedPerfectLanding)
+        {
+            OpenLandingMissionPanel(_landingMissionSuccessScenarios[0], totalScore);
+        }
+        else
+        {
+            OpenLandingMissionPanel(_landingMissionFailedScenario, totalScore);
         }
     }
 
-    private void OpenLandingMissionSuccessScenarios(LunaLandingMissionScenariosSO lunaLandingMissionSuccessScenariosSO, int TotalScore)
+    private void OpenLandingMissionPanel(LunaLandingMissionScenariosSO scenario, int totalScore)
     {
-        ChangedMissionPanelActivity(true);
-        _gameFinishPanel.Init(lunaLandingMissionSuccessScenariosSO, TotalScore);
+        SetMissionPanelActive(true);
+        _gameFinishPanel.Init(scenario, totalScore);
     }
-    private void OpenLandingMissionFailedScenarios(LunaLandingMissionScenariosSO lunaLandingMissionFailedScenariosSO, int TotalScore)
-    {
-        ChangedMissionPanelActivity(true);
-        _gameFinishPanel.Init(lunaLandingMissionFailedScenariosSO, TotalScore);
-    }
-    private void ChangedMissionPanelActivity(bool canActive)
+    private void SetMissionPanelActive(bool canActive)
     {
         _gameFinishPanel.gameObject.SetActive(canActive);
     }

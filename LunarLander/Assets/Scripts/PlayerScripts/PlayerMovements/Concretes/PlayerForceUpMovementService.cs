@@ -15,9 +15,8 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerMovements.Concretes
         }
         public IPlayerForceSO PlayerForceSO => _playerController.PlayerForceSO;
         public IPlayerInput PlayerInput => _playerController.PlayerInput;
-        public Rigidbody2D Rigidbody2D => _playerController.Rigidbody2D;
+        public Rigidbody2D RigidBody2D => _playerController.Rigidbody2D;
         public IPlayerFuel PlayerFuel => _playerController.FuelController;
-
         public IPlayerFeedback PlayerFeedback => _playerController.PlayerFeedback;
     }
 

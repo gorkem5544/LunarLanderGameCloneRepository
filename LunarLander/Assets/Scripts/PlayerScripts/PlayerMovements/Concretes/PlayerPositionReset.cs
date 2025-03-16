@@ -14,7 +14,7 @@ namespace Assembly_CSharp.Assets.Scripts.PlayerScripts.PlayerMovements.Concretes
         {
             _playerPositionResetService.PlayerController.transform.position = _playerPositionResetService.InitialPosition;
             _playerPositionResetService.PlayerController.Rigidbody2D.freezeRotation = true;
-            _playerPositionResetService.PlayerController.Rigidbody2D.velocity = Vector3.zero;
+            _playerPositionResetService.PlayerController.Rigidbody2D.linearVelocity = Vector3.zero;
             _playerPositionResetService.PlayerController.Rigidbody2D.freezeRotation = false;
             _playerPositionResetService.PlayerController.transform.rotation = Quaternion.Euler(_playerPositionResetService.InitialEulerAngles);
         }
